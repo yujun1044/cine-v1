@@ -739,7 +739,7 @@ export const CinemaHall3DViewer: React.FC<CinemaHall3DViewerProps> = ({
 
     wireableMaterialsRef.current = wireableMats;
 
-    const clock = new THREE.Clock();
+    let lastTimeMs = performance.now();
 
     const scheduleFrame = () => {
       if (disposed || frameId !== null || softwareTimerId !== null) return;
@@ -747,6 +747,7 @@ export const CinemaHall3DViewer: React.FC<CinemaHall3DViewerProps> = ({
     };
 
     const requestRender = () => {
+      lastTimeMs = performance.now();
       needsRender = true;
       scheduleFrame();
     };
@@ -771,7 +772,9 @@ export const CinemaHall3DViewer: React.FC<CinemaHall3DViewerProps> = ({
       frameId = null;
       if (disposed) return;
 
-      const delta = Math.min(clock.getDelta(), 0.05);
+      const nowMs = performance.now();
+      const delta = Math.min((nowMs - lastTimeMs) / 1000, 0.05);
+      lastTimeMs = nowMs;
       let keepRunning = false;
 
       // 4DX hydraulic motion row articulation
