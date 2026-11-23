@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, CheckCircle2, Armchair } from 'lucide-react';
 import { SeatRow, BrandConfig } from '../types';
+import heroBlockbusterImg from '../assets/images/hero_cinematic_blockbuster_1794209491695.jpg';
 
 interface SeatSimulatorSectionProps {
   brand: BrandConfig;
@@ -146,7 +147,7 @@ export const SeatSimulatorSection: React.FC<SeatSimulatorSectionProps> = ({
               className="w-full h-full rounded-t-2xl border-t-2 border-[#C2A878]/60 transition-all duration-700 flex flex-col items-center justify-center text-center p-4 relative overflow-hidden"
               style={{
                 transform: currentInfo.perspectiveStyle,
-                backgroundImage: `linear-gradient(to bottom, rgba(16, 17, 20, 0.45), rgba(16, 17, 20, 0.85)), url('/src/assets/images/hero_cinematic_blockbuster_1794209491695.jpg')`,
+                backgroundImage: `linear-gradient(to bottom, rgba(16, 17, 20, 0.45), rgba(16, 17, 20, 0.85)), url('${heroBlockbusterImg}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}

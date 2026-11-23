@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX, Maximize2, Radio } from 'lucide-react';
 import { AudioMode, BrandConfig } from '../types';
+import aspectRatioFrameImg from '../assets/images/aspect_ratio_movie_frame_1794209493491.jpg';
 
 interface FormatComparisonSectionProps {
   brand: BrandConfig;
@@ -182,7 +183,7 @@ export const FormatComparisonSection: React.FC<FormatComparisonSectionProps> = (
             <div className="relative w-full aspect-video bg-[#101114] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center">
               {/* High-Fidelity Generated Movie Still */}
               <img
-                src="/src/assets/images/aspect_ratio_movie_frame_1794209493491.jpg"
+                src={aspectRatioFrameImg}
                 alt="Alien Planet Expedition"
                 referrerPolicy="no-referrer"
                 className="absolute inset-0 w-full h-full object-cover transition-all duration-300"

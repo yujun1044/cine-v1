@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Users, Crown, ArrowRight, Eye, Check } from 'lucide-react';
 import { TheaterFormat, BrandConfig } from '../types';
+import privateBoxLoungeImg from '../assets/images/private_box_vip_lounge_1794209493890.jpg';
 
 interface PricingMatrixSectionProps {
   brand: BrandConfig;
@@ -367,7 +368,7 @@ export const PricingMatrixSection: React.FC<PricingMatrixSectionProps> = ({
 
             <div className="relative aspect-video w-full">
               <img
-                src="/src/assets/images/private_box_vip_lounge_1794209493890.jpg"
+                src={privateBoxLoungeImg}
                 alt="Private Box VIP Suite"
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"

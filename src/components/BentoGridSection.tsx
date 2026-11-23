@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Layers, Calculator } from 'lucide-react';
 import { BrandConfig } from '../types';
 import { CinemaHall3DViewer } from './CinemaHall3DViewer';
+import screenxPanoramicImg from '../assets/images/screenx_panoramic_scene_1794209493353.jpg';
 
 interface BentoGridSectionProps {
   brand: BrandConfig;
@@ -99,7 +100,7 @@ export const BentoGridSection: React.FC<BentoGridSectionProps> = ({
           <div className="bg-[#101114] p-3 rounded-2xl border border-white/10">
             <div className="relative w-full h-32 rounded-xl overflow-hidden mb-3">
               <img
-                src="/src/assets/images/screenx_panoramic_scene_1794209493353.jpg"
+                src={screenxPanoramicImg}
                 alt="Cyberpunk Panorama"
                 referrerPolicy="no-referrer"
                 className={`w-full h-full object-cover transition-transform duration-500 ${

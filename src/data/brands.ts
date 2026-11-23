@@ -1,4 +1,8 @@
 import { BrandConfig } from '../types';
+import heroBlockbusterImg from '../assets/images/hero_cinematic_blockbuster_1794209491695.jpg';
+import screenxPanoramicImg from '../assets/images/screenx_panoramic_scene_1794209493353.jpg';
+import aspectRatioFrameImg from '../assets/images/aspect_ratio_movie_frame_1794209493491.jpg';
+import privateBoxLoungeImg from '../assets/images/private_box_vip_lounge_1794209493890.jpg';
 
 export const BRAND_PRESETS: Record<string, BrandConfig> = {
   cine_v: {
@@ -11,7 +15,7 @@ export const BRAND_PRESETS: Record<string, BrandConfig> = {
     featuredMovie: {
       title: '<아바타: 불과 재> IMAX 3D',
       badge: '이번 주 특별관 예매율 1위',
-      image: '/src/assets/images/hero_cinematic_blockbuster_1794209491695.jpg',
+      image: heroBlockbusterImg,
       subhead: 'IMAX의 압도적 스케일부터 4DX의 오감 모션까지. 당신에게 딱 맞는 특별관 스펙을 미리 경험하고 최고의 명당을 선택하세요.',
     },
     branches: [
@@ -31,7 +35,7 @@ export const BRAND_PRESETS: Record<string, BrandConfig> = {
     featuredMovie: {
       title: '<사이버 시티 2099: 네오 도쿄> 270° PLF',
       badge: '차세대 가상 파노라마 최초 상영',
-      image: '/src/assets/images/screenx_panoramic_scene_1794209493353.jpg',
+      image: screenxPanoramicImg,
       subhead: '정면과 양측 벽면을 360도로 에워싸는 270도 미래도시 파노라마. 일렉트릭 공간 음향과 함께 시각의 한계를 돌파하세요.',
     },
     branches: [
@@ -51,7 +55,7 @@ export const BRAND_PRESETS: Record<string, BrandConfig> = {
     featuredMovie: {
       title: '<익스페디션: 붉은 행성 4K> DUAL LASER',
       badge: '전 회차 전석 매진 신화 달성',
-      image: '/src/assets/images/aspect_ratio_movie_frame_1794209493491.jpg',
+      image: aspectRatioFrameImg,
       subhead: '미개척지 행성의 협곡을 질주하는 탐사선의 진동을 그대로. 4K 레이저와 오감 모션시트로 온몸으로 느끼는 극한의 탐험.',
     },
     branches: [
@@ -71,7 +75,7 @@ export const BRAND_PRESETS: Record<string, BrandConfig> = {
     featuredMovie: {
       title: '<더 마제스틱 오페라> PRIVATE BOX VIP',
       badge: '👑 최고급 VIP 부티크 전용관 프리미어',
-      image: '/src/assets/images/private_box_vip_lounge_1794209493890.jpg',
+      image: privateBoxLoungeImg,
       subhead: '단 한 팀만을 위한 프라이빗 스위트룸. 뱅앤올룹슨 하이엔드 어쿠스틱과 웰컴 샴페인 케이터링이 선사하는 궁극의 품격.',
     },
     branches: [
