@@ -1,0 +1,8 @@
+{
+  "name": "Remix CINE V 특별관 몰입형 쇼룸",
+  "description": "차세대 몰입형 영화관 인터랙티브 쇼룸. 벤토 그리드, 명당 시야각 3D 시뮬레이터, 화면비 비교, 인터랙티브 요금제 및 빠른 예매 시스템.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

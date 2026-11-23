@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CGV 특별관 몰입형 쇼룸 - UX/UI 리뉴얼 프로토타입</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cgv: {
+              red: '#E60012',
+              redHover: '#FF1A2D',
+              dark: '#0B0B0E',
+              surface: '#16161C',
+              card: '#1F1F28',
+              border: '#2C2C3A',
+              gold: '#FFD700',
+              goldDark: '#B89B00',
+              muted: '#8E8E9F'
+            }
+          },
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+          },
+          boxShadow: {
+            'glow-red': '0 0 25px rgba(230, 0, 18, 0.45)',
+            'glow-gold': '0 0 25px rgba(255, 215, 0, 0.35)',
+            'card-hover': '0 12px 30px rgba(0, 0, 0, 0.7)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Pretendard Font CDN -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0B0E;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2C2C3A;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #E60012;
+    }
+
+    /* Glassmorphism Header */
+    .glass-header {
+      background: rgba(11, 11, 14, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Glass Card Style */
+    .glass-card {
+      background: rgba(22, 22, 28, 0.75);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(230, 0, 18, 0.35);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(230, 0, 18, 0.2);
+    }
+
+    /* Inspector Banner & Callouts */
+    .inspector-badge {
+      background: linear-gradient(135deg, #7C3AED 0%, #D946EF 100%);
+    }
+    .inspector-callout {
+      background: rgba(30, 15, 55, 0.9);
+      border: 1px solid rgba(217, 70, 239, 0.4);
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
+    }
+
+    /* Radial Vignette Overlay */
+    .bg-radial-vignette {
+      background: radial-gradient(circle at center, transparent 30%, rgba(11, 11, 14, 0.95) 95%);
+    }
+
+    /* 3D Perspective Container for Seat Simulator */
+    .perspective-stage {
+      perspective: 900px;
+      perspective-origin: 50% 60%;
+    }
+
+    /* Range Input Custom Design */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #E60012;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(230, 0, 18, 0.9);
+      margin-top: -8px;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: #2C2C3A;
+      border-radius: 3px;
+    }
+
+    /* Keyframe Animations */
+    @keyframes seatVibrate {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-3px, 3px) rotate(-1.5deg); }
+      40% { transform: translate(3px, -2px) rotate(1.5deg); }
+      60% { transform: translate(-2px, -2px) rotate(0deg); }
+      80% { transform: translate(3px, 2px) rotate(1deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+    .animate-vibrate {
+      animation: seatVibrate 0.25s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 10px rgba(230,0,18,0.5)); }
+      50% { opacity: 1; filter: drop-shadow(0 0 25px rgba(230,0,18,0.9)); }
+    }
+    .animate-pulse-glow {
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-cgv-dark text-gray-100 font-sans antialiased selection:bg-cgv-red selection:text-white relative min-h-screen">
+
+  <!-- ========================================== -->
+  <!-- 1. FIXED GLASSMORPHISM HEADER (GNB) -->
+  <!-- ========================================== -->
+  <header class="fixed top-0 left-0 w-full z-50 glass-header transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Left: CGV 3D Signature Logo -->
+      <a href="#" class="flex items-center space-x-3 group">
+        <div class="w-11 h-11 bg-cgv-red rounded-xl flex items-center justify-center font-black text-2xl tracking-tighter text-white shadow-glow-red transform group-hover:scale-105 transition-transform border border-red-400/30">
+          CGV
+        </div>
+        <div class="flex flex-col">
+          <span class="text-lg font-black tracking-wider text-white">SPECIAL THEATER</span>
+          <span class="text-[10px] text-cgv-muted tracking-widest uppercase font-semibold">Cinematic Showroom</span>
+        </div>
+      </a>
+
+      <!-- Center: Anchor Navigation Links -->
+      <nav class="hidden lg:flex items-center space-x-7 text-sm font-semibold">
+        <a href="#hero" class="text-gray-300 hover:text-cgv-red transition-colors">홈</a>
+        <a href="#format-comparison" class="text-gray-300 hover:text-cgv-red transition-colors">포맷 비교</a>
+        <a href="#bento-grid" class="text-gray-300 hover:text-cgv-red transition-colors">특별관 테크</a>
+        <a href="#seat-simulator" class="text-gray-300 hover:text-cgv-red transition-colors">명당 시야각</a>
+        <a href="#pricing-matrix" class="text-gray-300 hover:text-cgv-red transition-colors">요금 매트릭스</a>
+      </nav>
+
+      <!-- Right Controls: Portfolio Inspector Toggle + Ghost Actions -->
+      <div class="flex items-center space-x-3">
+        <!-- Portfolio UX Inspector Toggle Button -->
+        <button id="inspectorToggleBtn" onclick="toggleInspectorMode()" class="px-3.5 py-1.5 rounded-full text-xs font-bold text-white inspector-badge hover:opacity-95 transition-all flex items-center space-x-1.5 shadow-lg border border-fuchsia-400/40 transform active:scale-95">
+          <span class="text-base">🎨</span>
+          <span id="inspectorBtnText">기획 의도 보기 [OFF]</span>
+        </button>
+
+        <!-- Language Selector -->
+        <button onclick="toggleLanguage()" class="hidden sm:block text-xs font-bold text-gray-400 hover:text-white px-2.5 py-1 rounded-md border border-gray-700/60">
+          KOR / ENG
+        </button>
+
+        <!-- Ticket Booking Ghost Button -->
+        <button onclick="openBookingModal()" class="px-4 py-2 rounded-xl border border-cgv-red text-cgv-red hover:bg-cgv-red hover:text-white transition-all text-xs sm:text-sm font-bold shadow-sm flex items-center space-x-1">
+          <span>🎟️</span>
+          <span>예매 내역</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Portfolio UX Inspector Mode Alert Banner (Top Floating) -->
+  <div id="inspectorBanner" class="hidden fixed top-20 left-0 w-full bg-purple-950/90 border-b border-purple-500/40 text-purple-200 text-xs py-2.5 px-4 text-center z-40 backdrop-blur-md">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <span class="font-bold text-white flex items-center space-x-2">
+        <span class="px-2 py-0.5 rounded bg-purple-700 text-white font-extrabold text-[10px]">10년차 웹디자이너 UX 분석 모드</span>
+        <span>As-Is 문제점 vs To-Be 리뉴얼 전략 주석 박스가 활성화되었습니다.</span>
+      </span>
+      <button onclick="toggleInspectorMode()" class="text-purple-300 hover:text-white font-bold underline text-[11px]">끄기 ✕</button>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- 2. HERO SECTION (100vh Above the Fold) -->
+  <!-- ========================================== -->
+  <section id="hero" class="relative min-h-screen flex flex-col justify-between pt-28 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden bg-cgv-dark">
+    
+    <!-- Hero Canvas / Video Background Ambient Loop -->
+    <div class="absolute inset-0 z-0">
+      <canvas id="ambientCanvas" class="w-full h-full object-cover opacity-50"></canvas>
+      <div id="heroFormatBackdrop" class="absolute inset-0 bg-gradient-to-t from-cgv-dark via-cgv-dark/70 to-transparent transition-all duration-700"></div>
+      <div class="absolute inset-0 bg-radial-vignette opacity-80 pointer-events-none"></div>
+    </div>
+
+    <!-- Hero Content (Centered) -->
+    <div class="relative z-10 max-w-5xl mx-auto my-auto text-center pt-4">
+      
+      <!-- UX Inspector Callout (Hero) -->
+      <div class="inspector-callout hidden mb-6 p-4 rounded-2xl text-left text-xs text-purple-200 shadow-2xl animate-fade-in">
+        <div class="flex items-center space-x-2 text-purple-300 font-bold mb-1.5">
+          <span class="px-2.5 py-0.5 rounded-full bg-purple-800 text-white text-[10px]">HERO SECTION UX</span>
+          <span>As-Is: 무분별한 팝업 & 정적 배너 ➔ To-Be: 시네마틱 루프 & 포맷 스위처 독</span>
+        </div>
+        <p class="text-purple-100 leading-relaxed">
+          접속 3초 안에 흥행 대작의 시네마틱 분위기를 전달하며, 우측 하단 플로팅 독(Dock)을 조작해 IMAX(1.90:1), 4DX, SCREENX의 비주얼 화각 차이를 첫 화면에서 즉시 체험하도록 설계했습니다.
+        </p>
+      </div>
+
+      <!-- Trending Movie Badge -->
+      <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-cgv-red/20 border border-cgv-red/40 text-cgv-red text-xs font-bold mb-6 animate-pulse-glow">
+        <span class="text-base">🔥</span>
+        <span>이번 주 IMAX 3D 예매율 1위</span>
+        <span class="text-gray-400">|</span>
+        <span class="text-white font-extrabold">&lt;아바타: 불과 재&gt; 하이라이트</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-none mb-6">
+        스크린을 넘어,<br class="hidden sm:inline" />
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-cgv-red">
+          영화 속으로 들어가는 순간.
+        </span>
+      </h1>
+
+      <!-- Subhead -->
+      <p class="text-base sm:text-xl text-gray-300 max-w-3xl mx-auto font-medium leading-relaxed mb-10">
+        IMAX의 압도적 스케일부터 4DX의 오감 모션까지.<br class="hidden sm:inline" />
+        당신에게 딱 맞는 특별관 스펙을 미리 경험하고 최고의 명당을 선택하세요.
+      </p>
+
+      <!-- Dual CTA Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <button onclick="openBookingModal('IMAX')" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-cgv-red hover:bg-cgv-redHover text-white font-extrabold text-lg shadow-glow-red transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center space-x-2">
+          <span>🎟️ IMAX 명당 즉시 예매하기</span>
+          <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+        </button>
+
+        <a href="#format-comparison" class="w-full sm:w-auto px-8 py-4 rounded-2xl glass-card hover:bg-white/10 text-gray-200 font-bold text-lg transition-all flex items-center justify-center space-x-2">
+          <span>🔍 포맷별 차이 10초 체험하기</span>
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Floating Format Switcher Bottom Dock (Bottom 120px) -->
+    <div class="relative z-20 max-w-4xl mx-auto w-full mt-8">
+      <div class="glass-card rounded-2xl p-3 sm:p-4 grid grid-cols-3 gap-3 sm:gap-4 border border-white/10 shadow-card-hover">
+        
+        <!-- Switcher Card 1: IMAX -->
+        <button onclick="selectHeroFormat('imax')" id="dock-imax" class="dock-btn group p-3.5 sm:p-4 rounded-xl bg-cgv-red/20 border-2 border-cgv-red text-left transition-all relative overflow-hidden">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-black text-base sm:text-xl text-white">IMAX</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-cgv-red text-white font-extrabold">1.90:1</span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-gray-300 hidden sm:block">26% 더 넓어진 압도적 화각</p>
+          <div class="mt-2 text-[10px] text-cgv-red font-bold flex items-center space-x-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-cgv-red animate-ping"></span>
+            <span>라이브 화각 적용 중</span>
+          </div>
+        </button>
+
+        <!-- Switcher Card 2: 4DX -->
+        <button onclick="selectHeroFormat('4dx')" id="dock-4dx" class="dock-btn group p-3.5 sm:p-4 rounded-xl bg-cgv-surface hover:bg-cgv-card border-2 border-transparent text-left transition-all relative overflow-hidden">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-black text-base sm:text-xl text-gray-300 group-hover:text-white">4DX</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white font-extrabold">오감 모션</span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-gray-400 hidden sm:block">12가지 모션시트 & 환경 연출</p>
+          <div class="mt-2 text-[10px] text-gray-500 group-hover:text-blue-400 font-bold">
+            <span>체험 클릭 ➔</span>
+          </div>
+        </button>
+
+        <!-- Switcher Card 3: SCREENX -->
+        <button onclick="selectHeroFormat('screenx')" id="dock-screenx" class="dock-btn group p-3.5 sm:p-4 rounded-xl bg-cgv-surface hover:bg-cgv-card border-2 border-transparent text-left transition-all relative overflow-hidden">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-black text-base sm:text-xl text-gray-300 group-hover:text-white">SCREENX</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-600 text-white font-extrabold">270° 파노라마</span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-gray-400 hidden sm:block">좌/우 벽면까지 3면 파노라마</p>
+          <div class="mt-2 text-[10px] text-gray-500 group-hover:text-purple-400 font-bold">
+            <span>체험 클릭 ➔</span>
+          </div>
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ========================================== -->
+  <!-- 3. SECTION 2: INTERACTIVE FORMAT COMPARISON -->
+  <!-- ========================================== -->
+  <section id="format-comparison" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
+    
+    <!-- Section Title -->
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="text-cgv-red text-xs font-extrabold uppercase tracking-widest mb-2">COMPARISON SIMULATOR</div>
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">화면비 & 공간 음향 체감 시뮬레이터</h2>
+      <p class="text-gray-400 text-sm sm:text-base">슬라이더를 움직여 일반 상영관 대비 IMAX 스크린에서 확장되는 26% 시야를 직접 확인해보세요.</p>
+    </div>
+
+    <!-- UX Inspector Callout (Format Showroom) -->
+    <div class="inspector-callout hidden mb-8 p-4 rounded-2xl text-left text-xs text-purple-200">
+      <div class="flex items-center space-x-2 text-purple-300 font-bold mb-1.5">
+        <span class="px-2.5 py-0.5 rounded-full bg-purple-800 text-white text-[10px]">FORMAT SIMULATOR UX</span>
+        <span>As-Is: 모호한 수치 표기(1.90:1) ➔ To-Be: 드래그 슬라이더로 잘려나가는 시야 직관화</span>
+      </div>
+      <p class="text-purple-100">
+        유저가 티켓값 가치를 망설이는 페인 포인트를 해결하기 위해, 슬라이더 조절 시 잘려나가는 상하 영역이 리얼타임으로 가시화되는 비교 캔버스를 구현했습니다.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <!-- Interactive Aspect Ratio Slider Visualizer (7 Cols) -->
+      <div class="lg:col-span-7 glass-card p-6 sm:p-8 rounded-3xl border border-cgv-border">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-cgv-red"></span>
+            <span class="font-bold text-sm text-white">화면 비율 라이브 비교 (Aspect Ratio)</span>
+          </div>
+          <span id="sliderValueText" class="text-xs font-mono px-2.5 py-1 bg-cgv-dark rounded-md text-cgv-gold font-bold border border-cgv-gold/30">
+            IMAX 1.90:1 (풀스크린)
+          </span>
+        </div>
+
+        <!-- Canvas Frame Container -->
+        <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center">
+          
+          <!-- Background Simulated Movie Frame -->
+          <div id="movieFrameFull" class="absolute inset-0 bg-cover bg-center transition-all duration-300 flex items-center justify-center" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80');">
+            <!-- Overlay Grid Lines indicating IMAX Expanded Area -->
+            <div class="w-full h-full border-2 border-cgv-gold/40 flex items-center justify-center relative">
+              <span class="absolute top-3 left-3 text-[10px] bg-cgv-gold text-black font-black px-2 py-0.5 rounded shadow">IMAX EXPANDED AREA (+26%)</span>
+            </div>
+          </div>
+
+          <!-- Cropped Mask overlay (Standard 2.39:1 Letterbox) -->
+          <div id="croppedMaskTop" class="absolute inset-x-0 top-0 bg-black/85 transition-all duration-100 flex items-center justify-center pointer-events-none" style="height: 0%;">
+            <span class="text-[9px] text-gray-400 uppercase tracking-widest font-mono">Standard 2.39:1 Cropped Bar</span>
+          </div>
+          <div id="croppedMaskBottom" class="absolute inset-x-0 bottom-0 bg-black/85 transition-all duration-100 flex items-center justify-center pointer-events-none" style="height: 0%;">
+            <span class="text-[9px] text-gray-400 uppercase tracking-widest font-mono">Standard 2.39:1 Cropped Bar</span>
+          </div>
+        </div>
+
+        <!-- Slider Control -->
+        <div class="mt-6">
+          <div class="flex justify-between text-xs text-gray-400 mb-2 font-medium">
+            <span>일반관 (2.39:1 상하 잘림)</span>
+            <span class="text-cgv-red font-bold">드래그하여 화각 비교 ↔</span>
+            <span class="text-cgv-gold font-bold">IMAX (1.90:1 26% 더 넓음)</span>
+          </div>
+          <input type="range" id="ratioSlider" min="0" max="100" value="100" oninput="updateAspectRatioSlider(this.value)" class="w-full" />
+        </div>
+      </div>
+
+      <!-- Spatial Audio Visualizer & Audio Test (5 Cols) -->
+      <div class="lg:col-span-5 glass-card p-6 sm:p-8 rounded-3xl border border-cgv-border flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-lg text-white">Dolby Atmos 64ch 공간 음향</h3>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-blue-900/60 text-blue-300 border border-blue-500/30 font-semibold">Dynamic Audio Wave</span>
+          </div>
+          <p class="text-xs text-gray-400 mb-6 leading-relaxed">
+            천장과 머리 뒤쪽 스피커까지 연동된 객체 기반 서라운드 음향입니다. 아래 모드를 전환하여 3D 공간 파형 모션을 체험하세요.
+          </p>
+
+          <!-- Audio Wave Canvas Container -->
+          <div class="bg-black/70 rounded-2xl p-4 border border-white/5 mb-6">
+            <canvas id="audioWaveCanvas" class="w-full h-28"></canvas>
+          </div>
+        </div>
+
+        <!-- Audio Mode Selector Toggle -->
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="setAudioMode('stereo')" id="btn-stereo" class="py-3 px-4 rounded-xl border border-gray-700 bg-cgv-surface text-gray-300 text-xs font-bold hover:border-gray-500 transition-all flex flex-col items-center space-y-1">
+            <span>2.1ch 스테레오 (일반)</span>
+            <span class="text-[10px] font-normal text-gray-500">평면적 평범한 음향</span>
+          </button>
+          <button onclick="setAudioMode('atmos')" id="btn-atmos" class="py-3 px-4 rounded-xl border-2 border-cgv-red bg-cgv-red/20 text-white text-xs font-bold shadow-glow-red transition-all flex flex-col items-center space-y-1">
+            <span class="text-cgv-gold font-extrabold">64ch Dolby Atmos</span>
+            <span class="text-[10px] font-normal text-gray-200">입체 3D 객체 서라운드</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ========================================== -->
+  <!-- 4. SECTION 3: 12-COLUMN BENTO GRID SHOWCASE -->
+  <!-- ========================================== -->
+  <section id="bento-grid" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="text-cgv-gold text-xs font-extrabold uppercase tracking-widest mb-2">SPECIAL TECHNOLOGY</div>
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">CGV 4대 핵심 특별관 테크놀로지</h2>
+      <p class="text-gray-400 text-sm sm:text-base">압도적 스크린부터 오감 자극 모션, 270도 서라운드 뷰까지 한눈에 탐색하세요.</p>
+    </div>
+
+    <!-- UX Inspector Callout (Bento Grid) -->
+    <div class="inspector-callout hidden mb-8 p-4 rounded-2xl text-left text-xs text-purple-200">
+      <div class="flex items-center space-x-2 text-purple-300 font-bold mb-1.5">
+        <span class="px-2.5 py-0.5 rounded-full bg-purple-800 text-white text-[10px]">BENTO GRID UX</span>
+        <span>As-Is: 개별 페이지 파편화 ➔ To-Be: 최신 12컬럼 비대칭 Bento Layout 쇼케이스</span>
+      </div>
+      <p class="text-purple-100">
+        4가지 핵심 기술력(IMAX 4K 레이저, 4DX 모션, SCREENX 3면 파노라마, 무비패스)을 한 화면에 압축 시각화하여 사용자의 피로도를 최소화했습니다.
+      </p>
+    </div>
+
+    <!-- 12-Column Grid Container -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+      
+      <!-- Box 1 (Large 8 Cols): IMAX 4K Dual Laser -->
+      <div class="md:col-span-8 glass-card p-8 rounded-3xl border border-cgv-border hover:border-cgv-red/50 transition-all group relative overflow-hidden flex flex-col justify-between">
+        <div class="relative z-10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-cgv-red/20 text-cgv-red border border-cgv-red/30 text-xs font-black">IMAX 4K LASER</span>
+            <span class="text-xs text-gray-400 font-mono">DUAL LASER PROJECTION</span>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-black text-white mb-3">60% 향상된 선명도 & 압도적 명암비</h3>
+          <p class="text-gray-300 text-sm max-w-xl leading-relaxed mb-6">
+            기존 디지털 프로젝터 대비 60% 향상된 밝기와 2배 높아진 명암비로 선명한 시네마틱 리얼리티를 선사합니다.
+          </p>
+        </div>
+
+        <!-- Interactive Screen Expansion Demo Container -->
+        <div class="relative z-10 w-full h-52 bg-black/80 rounded-2xl border border-white/10 overflow-hidden p-4 flex items-center justify-center">
+          <div id="bentoImaxScreen" class="w-2/3 h-32 bg-gradient-to-r from-blue-900 via-cgv-red to-purple-900 rounded-xl transition-all duration-500 flex items-center justify-center shadow-2xl relative">
+            <span id="bentoImaxLabel" class="text-xs font-black text-white tracking-widest uppercase">STANDARD SCREEN</span>
+          </div>
+          <button onclick="toggleBentoImaxExpand()" class="absolute bottom-4 right-4 px-3.5 py-2 bg-cgv-red hover:bg-cgv-redHover text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+            스크린 4K 레이저 확장 토글 ⚡
+          </button>
+        </div>
+      </div>
+
+      <!-- Box 2 (Medium 4 Cols): 4DX Sensory Motion Seat -->
+      <div class="md:col-span-4 glass-card p-8 rounded-3xl border border-cgv-border hover:border-blue-500/50 transition-all flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-blue-900/30 text-blue-400 border border-blue-500/30 text-xs font-black">4DX MOTION</span>
+            <span class="text-xs text-gray-400">12 EFFECTS</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">12가지 모션시트 & 환경 효과</h3>
+          <p class="text-xs text-gray-400 mb-6">버튼을 클릭하여 4DX 오감 특수효과를 시뮬레이션 하세요.</p>
+        </div>
+
+        <!-- Seat Graphic & Interactive Sensory Effect Buttons -->
+        <div class="flex flex-col items-center">
+          <div id="seatGraphic" class="w-20 h-20 mb-6 text-gray-300 transition-all flex items-center justify-center">
+            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M7 13c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2S5 3.9 5 5v6c0 1.1.9 2 2 2zm10 0c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2s-2 .9-2 2v6c0 1.1.9 2 2 2zm-5 8c2.21 0 4-1.79 4-4v-3H8v3c0 2.21 1.79 4 4 4z"/>
+            </svg>
+          </div>
+
+          <!-- Effect Trigger Buttons Grid -->
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <button onclick="trigger4dxEffect('wind')" class="py-2.5 px-2 rounded-xl bg-cgv-surface border border-gray-700 hover:border-blue-400 text-[11px] font-bold text-gray-200 transition-all">💨 바람 효과</button>
+            <button onclick="trigger4dxEffect('water')" class="py-2.5 px-2 rounded-lg bg-cgv-surface border border-gray-700 hover:border-blue-400 text-[11px] font-bold text-gray-200 transition-all">💧 워터 미스트</button>
+            <button onclick="trigger4dxEffect('scent')" class="py-2.5 px-2 rounded-lg bg-cgv-surface border border-gray-700 hover:border-blue-400 text-[11px] font-bold text-gray-200 transition-all">🌿 아로마 향기</button>
+            <button onclick="trigger4dxEffect('shake')" class="py-2.5 px-2 rounded-lg bg-cgv-surface border border-gray-700 hover:border-blue-400 text-[11px] font-bold text-gray-200 transition-all">💥 진동 모션시트</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Box 3 (Small 6 Cols): SCREENX 270° Panorama View -->
+      <div class="md:col-span-6 glass-card p-8 rounded-3xl border border-cgv-border hover:border-purple-500/50 transition-all flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-purple-900/30 text-purple-400 border border-purple-500/30 text-xs font-black">SCREENX</span>
+            <span class="text-xs text-gray-400">270° PANORAMA</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">정면과 좌우 벽면까지 3면 파노라마</h3>
+          <p class="text-xs text-gray-400 mb-4">좌/우 벽면 스크린을 클릭하여 시야각 확장을 체감하세요.</p>
+        </div>
+
+        <!-- 3-Sided Screen Interactive Panorama -->
+        <div class="grid grid-cols-3 gap-2 bg-black/70 p-3 rounded-2xl border border-white/10">
+          <button onclick="toggleSxSide('left')" id="sx-left" class="h-24 bg-purple-950/50 hover:bg-purple-900/80 border border-purple-500/30 rounded-xl flex items-center justify-center text-[10px] text-purple-300 font-bold transition-all">
+            👈 좌측 스크린
+          </button>
+          <button onclick="toggleSxSide('center')" id="sx-center" class="h-24 bg-purple-600 rounded-xl flex items-center justify-center text-[10px] text-white font-extrabold shadow-lg transition-all">
+            📺 정면 메인
+          </button>
+          <button onclick="toggleSxSide('right')" id="sx-right" class="h-24 bg-purple-950/50 hover:bg-purple-900/80 border border-purple-500/30 rounded-xl flex items-center justify-center text-[10px] text-purple-300 font-bold transition-all">
+            우측 스크린 👉
+          </button>
+        </div>
+      </div>
+
+      <!-- Box 4 (Small 6 Cols): CGV MoviePass / VIP Calculator -->
+      <div class="md:col-span-6 glass-card p-8 rounded-3xl border border-cgv-border hover:border-cgv-gold/50 transition-all flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-amber-900/30 text-cgv-gold border border-amber-500/30 text-xs font-black">MOVIE PASS</span>
+            <span class="text-xs text-gray-400">VIP CALCULATOR</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">특별관 전용 무비패스 혜택 계산기</h3>
+          <p class="text-xs text-gray-400 mb-4">월 관람 회차를 선택하면 절약 가능한 예상 비용을 계산해드립니다.</p>
+        </div>
+
+        <!-- Calculator Controls -->
+        <div class="bg-black/50 p-4 rounded-2xl border border-white/10 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-xs text-gray-300 font-semibold">월 관람 횟수:</span>
+            <select id="calcMovies" onchange="calculatePassDiscount()" class="bg-cgv-surface text-white text-xs border border-gray-700 rounded-xl px-3 py-2 font-bold focus:border-cgv-red">
+              <option value="1">월 1회 관람</option>
+              <option value="2" selected>월 2회 관람</option>
+              <option value="4">월 4회 관람</option>
+            </select>
+          </div>
+
+          <div class="text-right">
+            <div class="text-[10px] text-gray-400 uppercase">예상 절감 혜택</div>
+            <div id="calcResultText" class="text-lg font-black text-cgv-gold">연간 60,000원 절약</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ========================================== -->
+  <!-- 5. SECTION 4: INTERACTIVE SEAT SIMULATOR -->
+  <!-- ========================================== -->
+  <section id="seat-simulator" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-cgv-border/40">
+    
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="text-cgv-red text-xs font-extrabold uppercase tracking-widest mb-2">SEAT PERSPECTIVE SIMULATOR</div>
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">상영관 명당 좌석 사전 체험</h2>
+      <p class="text-gray-400 text-sm sm:text-base">A열부터 G열(명당), M열까지 각 좌석에서 바라본 스크린 시야각을 예매 전 미리 확인하세요.</p>
+    </div>
+
+    <!-- UX Inspector Callout (Seat Simulator) -->
+    <div class="inspector-callout hidden mb-8 p-4 rounded-2xl text-left text-xs text-purple-200">
+      <div class="flex items-center space-x-2 text-purple-300 font-bold mb-1.5">
+        <span class="px-2.5 py-0.5 rounded-full bg-purple-800 text-white text-[10px]">SEAT SIMULATOR UX</span>
+        <span>As-Is: 예매 직전 단순 평면도 ➔ To-Be: A/G/M열 시야각 Dynamic 3D 시뮬레이션</span>
+      </div>
+      <p class="text-purple-100">
+        유저가 매진된 G열 외에도 A열(전열 몰입석)이나 M열(후열 서라운드석)의 매력을 체감하고 예매를 포기하지 않도록 설계했습니다.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <!-- Seat Selection Buttons (4 Cols) -->
+      <div class="lg:col-span-4 flex flex-col space-y-4">
+        
+        <!-- Row Button A -->
+        <button onclick="selectSeatRow('A')" id="seat-btn-A" class="seat-row-btn p-5 rounded-2xl bg-cgv-card border border-transparent hover:border-cgv-border text-left transition-all">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-extrabold text-lg text-white">A열 (전열 몰입석)</span>
+            <span class="text-xs px-2.5 py-0.5 bg-blue-900/60 text-blue-300 rounded-md font-semibold">압도적 꽉 찬 시야</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">화면이 시야 전체를 가득 채워 리얼리티와 몰입감을 극대화하는 좌석</p>
+        </button>
+
+        <!-- Row Button G (Golden Area) -->
+        <button onclick="selectSeatRow('G')" id="seat-btn-G" class="seat-row-btn p-5 rounded-2xl bg-cgv-red/20 border-2 border-cgv-red text-left transition-all shadow-glow-red">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-extrabold text-lg text-white">G열 (★ 골든 에리어 명당)</span>
+            <span class="text-xs px-2.5 py-0.5 bg-cgv-red text-white rounded-md font-extrabold">시선 일치 최고 명당</span>
+          </div>
+          <p class="text-xs text-gray-200 leading-relaxed">스크린 정중앙과 시선이 완벽히 일치하여 고개가 편안한 최선의 명당</p>
+        </button>
+
+        <!-- Row Button M -->
+        <button onclick="selectSeatRow('M')" id="seat-btn-M" class="seat-row-btn p-5 rounded-2xl bg-cgv-card border border-transparent hover:border-cgv-border text-left transition-all">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-extrabold text-lg text-white">M열 (후열 서라운드석)</span>
+            <span class="text-xs px-2.5 py-0.5 bg-purple-900/60 text-purple-300 rounded-md font-semibold">입체 음향 최적</span>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">전체 스크린을 한눈에 조망하며 64채널 서라운드 음향 밸런스가 뛰어난 좌석</p>
+        </button>
+
+      </div>
+
+      <!-- Perspective Viewport Stage (8 Cols) -->
+      <div class="lg:col-span-8 glass-card p-6 sm:p-8 rounded-3xl border border-cgv-border relative overflow-hidden">
+        
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cgv-gold animate-ping"></span>
+            <span id="currentSeatRowTitle" class="font-bold text-sm text-white">G열 12번 (골든 에리어 명당 시야각)</span>
+          </div>
+          <span class="text-xs text-gray-400 font-mono">3D Perspective Render</span>
+        </div>
+
+        <!-- Theater Stage Perspective Box -->
+        <div class="relative w-full aspect-video bg-black rounded-2xl border border-white/10 overflow-hidden flex flex-col items-center justify-center p-6 perspective-stage">
+          
+          <!-- Curved IMAX Screen Simulation -->
+          <div id="simulatedScreen" class="w-full h-full bg-gradient-to-b from-blue-900 via-cgv-red to-black rounded-t-2xl border-t-4 border-cgv-gold/80 transition-all duration-500 shadow-2xl flex flex-col items-center justify-center text-center p-4">
+            <span class="text-xs font-mono text-cgv-gold tracking-widest uppercase mb-1">IMAX CURVED SCREEN</span>
+            <span id="seatViewDescText" class="text-sm font-bold text-white max-w-md">시선 일치가 완벽하며 왜곡 없는 정중앙 골든 에리어</span>
+          </div>
+
+          <!-- Cinema Floor & Row Indicators -->
+          <div class="w-full h-10 bg-gradient-to-t from-cgv-surface to-transparent mt-2 flex items-center justify-center space-x-3">
+            <div id="rowMarkerA" class="w-8 h-2 rounded bg-gray-700"></div>
+            <div id="rowMarkerG" class="w-12 h-3 rounded bg-cgv-red shadow-glow-red"></div>
+            <div id="rowMarkerM" class="w-8 h-2 rounded bg-gray-700"></div>
+          </div>
+        </div>
+
+        <!-- Reserve This Row Button -->
+        <div class="mt-6 flex items-center justify-between">
+          <span class="text-xs text-gray-400">선택 좌석 상태: <strong id="seatAvailabilityText" class="text-emerald-400 font-bold">예매 가능 (잔여 14석)</strong></span>
+          <button onclick="openBookingModalWithSeat()" class="px-6 py-2.5 bg-cgv-red hover:bg-cgv-redHover text-white text-xs font-bold rounded-xl shadow-glow-red transition-all active:scale-95">
+            이 열로 명당 예매하기 ➔
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ========================================== -->
+  <!-- 6. SECTION 5: INTERACTIVE PRICING & MATRIX -->
+  <!-- ========================================== -->
+  <section id="pricing-matrix" class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <div class="text-cgv-gold text-xs font-extrabold uppercase tracking-widest mb-2">TRANSPARENT PRICING & MATRIX</div>
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">나에게 맞는 맞춤 특별관 추천 & 매트릭스</h2>
+      <p class="text-gray-400 text-sm sm:text-base">관람 대상과 선호 몰입도를 선택하여 최적의 포맷 플랜을 진단해보세요.</p>
+    </div>
+
+    <!-- Interactive Plan Recommendation Filter -->
+    <div class="glass-card p-6 rounded-3xl border border-cgv-border mb-10 max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-2">👥 누구와 관람하시나요?</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setFilterAudience('solo')" id="filter-solo" class="filter-aud-btn py-2 px-3 rounded-xl bg-cgv-surface border border-gray-700 text-xs font-bold text-gray-300 hover:border-cgv-red">혼자 관람</button>
+            <button onclick="setFilterAudience('couple')" id="filter-couple" class="filter-aud-btn py-2 px-3 rounded-xl bg-cgv-red/20 border-2 border-cgv-red text-xs font-extrabold text-white">커플/데이트</button>
+            <button onclick="setFilterAudience('family')" id="filter-family" class="filter-aud-btn py-2 px-3 rounded-xl bg-cgv-surface border border-gray-700 text-xs font-bold text-gray-300 hover:border-cgv-red">가족/친구</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-300 mb-2">🎯 원하는 관람 경험</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setFilterExperience('visual')" id="filter-visual" class="filter-exp-btn py-2 px-3 rounded-xl bg-cgv-red/20 border-2 border-cgv-red text-xs font-extrabold text-white">압도적 대화면</button>
+            <button onclick="setFilterExperience('sensory')" id="filter-sensory" class="filter-exp-btn py-2 px-3 rounded-xl bg-cgv-surface border border-gray-700 text-xs font-bold text-gray-300 hover:border-cgv-red">오감 모션</button>
+            <button onclick="setFilterExperience('vip')" id="filter-vip" class="filter-exp-btn py-2 px-3 rounded-xl bg-cgv-surface border border-gray-700 text-xs font-bold text-gray-300 hover:border-cgv-red">최상급 VIP</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendation Summary Result -->
+      <div class="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-xs">
+        <span class="text-gray-400">추천 진단 결과:</span>
+        <span id="recommendResultBadge" class="font-extrabold text-cgv-gold text-sm">🔥 IMAX LASER (압도적 몰입감 최적 선택)</span>
+      </div>
+    </div>
+
+    <!-- Pricing Table Matrix Container -->
+    <div class="glass-card rounded-3xl border border-cgv-border overflow-x-auto shadow-2xl">
+      <table class="w-full text-left border-collapse min-w-[700px]">
+        <thead>
+          <tr class="border-b border-cgv-border bg-cgv-surface/80 text-xs font-bold uppercase text-gray-400 tracking-wider">
+            <th class="p-5">특별관 포맷</th>
+            <th class="p-5">평균 관람료</th>
+            <th class="p-5">화면 비율</th>
+            <th class="p-5">핵심 특수효과</th>
+            <th class="p-5">추천 관람 대상</th>
+            <th class="p-5 text-right">선택</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-cgv-border/60 text-sm">
+          
+          <!-- Row 1: IMAX -->
+          <tr id="row-imax" class="hover:bg-cgv-surface/50 transition-colors bg-cgv-red/10">
+            <td class="p-5 font-black text-white flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cgv-red"></span>
+              <span>IMAX LASER</span>
+              <span class="text-[10px] bg-cgv-red text-white px-1.5 py-0.5 rounded font-black">추천 1위</span>
+            </td>
+            <td class="p-5 font-extrabold text-cgv-gold">22,000원</td>
+            <td class="p-5 text-gray-300 font-mono">1.90:1 (26% 확장)</td>
+            <td class="p-5 text-gray-300">4K Dual Laser & 12ch 오디오</td>
+            <td class="p-5 text-gray-400 text-xs">SF, 블록버스터, 대작 영화</td>
+            <td class="p-5 text-right">
+              <button onclick="openBookingModal('IMAX')" class="px-4 py-2 bg-cgv-red hover:bg-cgv-redHover text-white text-xs font-bold rounded-lg transition-all active:scale-95 shadow-glow-red">
+                예매
+              </button>
+            </td>
+          </tr>
+
+          <!-- Row 2: 4DX -->
+          <tr id="row-4dx" class="hover:bg-cgv-surface/50 transition-colors">
+            <td class="p-5 font-black text-white flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              <span>4DX</span>
+            </td>
+            <td class="p-5 font-extrabold text-cgv-gold">21,000원</td>
+            <td class="p-5 text-gray-300 font-mono">2.39:1 (일반관)</td>
+            <td class="p-5 text-gray-300">12가지 모션시트 + 환경 효과</td>
+            <td class="p-5 text-gray-400 text-xs">액션, 애니메이션, 카체이싱</td>
+            <td class="p-5 text-right">
+              <button onclick="openBookingModal('4DX')" class="px-4 py-2 bg-cgv-surface border border-gray-600 hover:border-blue-400 text-white text-xs font-bold rounded-lg transition-all active:scale-95">
+                예매
+              </button>
+            </td>
+          </tr>
+
+          <!-- Row 3: SCREENX -->
+          <tr id="row-screenx" class="hover:bg-cgv-surface/50 transition-colors">
+            <td class="p-5 font-black text-white flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+              <span>SCREENX</span>
+            </td>
+            <td class="p-5 font-extrabold text-cgv-gold">18,000원</td>
+            <td class="p-5 text-gray-300 font-mono">270° 3면 파노라마</td>
+            <td class="p-5 text-gray-300">좌/우 정면 3면 연동 스크린</td>
+            <td class="p-5 text-gray-400 text-xs">콘서트 실황, 뮤지컬, 마블 영화</td>
+            <td class="p-5 text-right">
+              <button onclick="openBookingModal('SCREENX')" class="px-4 py-2 bg-cgv-surface border border-gray-600 hover:border-purple-400 text-white text-xs font-bold rounded-lg transition-all active:scale-95">
+                예매
+              </button>
+            </td>
+          </tr>
+
+          <!-- Row 4: PRIVATE BOX -->
+          <tr id="row-privatebox" class="hover:bg-cgv-surface/50 transition-colors">
+            <td class="p-5 font-black text-white flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cgv-gold"></span>
+              <span>PRIVATE BOX</span>
+              <span class="text-[10px] bg-amber-900/40 text-cgv-gold px-1.5 py-0.5 rounded font-black">VIP관</span>
+            </td>
+            <td class="p-5 font-extrabold text-cgv-gold">50,000원 <span class="text-[10px] font-normal text-gray-400">(1인)</span></td>
+            <td class="p-5 text-gray-300 font-mono">프라이빗 가변관</td>
+            <td class="p-5 text-gray-300">전용 라운지 & 리클라이너 & B&O 음향</td>
+            <td class="p-5 text-gray-400 text-xs">기념일, 비즈니스, VIP 모임</td>
+            <td class="p-5 text-right">
+              <button onclick="openBookingModal('PRIVATE BOX')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg transition-all active:scale-95">
+                예매
+              </button>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <!-- ========================================== -->
+  <!-- 7. FOOTER -->
+  <!-- ========================================== -->
+  <footer class="bg-black/90 border-t border-cgv-border py-12 px-4 sm:px-6 lg:px-8 text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <div class="font-extrabold text-white text-lg mb-3">CGV SPECIAL THEATER</div>
+        <p class="leading-relaxed">본 포트폴리오 웹사이트는 10년차 웹디자이너의 CGV 특별관 몰입형 쇼룸 UX/UI 리뉴얼 과제용 단일 파일 웹 프로토타입입니다.</p>
+      </div>
+      <div>
+        <div class="font-bold text-gray-300 mb-2">특별관 빠른 안내</div>
+        <ul class="space-y-1">
+          <li><a href="#hero" class="hover:text-white">IMAX 4K Laser 상영관</a></li>
+          <li><a href="#hero" class="hover:text-white">4DX 오감 모션관</a></li>
+          <li><a href="#hero" class="hover:text-white">SCREENX 270도 파노라마</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-bold text-gray-300 mb-2">고객 안심 규정</div>
+        <ul class="space-y-1">
+          <li>상영 20분 전까지 취소 수수료 0원</li>
+          <li>모바일 티켓 즉시 발권 서비스</li>
+          <li>VIP 무비패스 수시 적립</li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-bold text-gray-300 mb-2">디자인 시스템 규격</div>
+        <p class="leading-relaxed">Pretendard Font / Dark Charcoal (#0B0B0E) / CGV Signature Red (#E60012) / Glassmorphism UI</p>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto pt-6 border-t border-gray-800 text-center flex flex-col sm:flex-row justify-between items-center text-[11px]">
+      <span>© CJ CGV. All rights reserved. (UX/UI Renewal Concept Showcase)</span>
+      <span class="mt-2 sm:mt-0 text-purple-400 font-mono">Designed by Senior UX/UI Designer</span>
+    </div>
+  </footer>
+
+
+  <!-- ========================================== -->
+  <!-- 8. TICKET BOOKING MODAL -->
+  <!-- ========================================== -->
+  <div id="bookingModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-cgv-border shadow-2xl relative animate-fade-in">
+      
+      <!-- Close Button -->
+      <button onclick="closeBookingModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white p-2 text-xl font-bold">
+        ✕
+      </button>
+
+      <div class="flex items-center space-x-2 mb-6">
+        <span class="w-3.5 h-3.5 rounded-full bg-cgv-red"></span>
+        <h3 class="text-xl font-extrabold text-white">CGV 특별관 빠른 예매</h3>
+      </div>
+
+      <!-- Booking Steps -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">선택된 포맷</label>
+          <input type="text" id="modalFormatInput" value="IMAX LASER 3D" readonly class="w-full bg-cgv-surface border border-cgv-border text-white text-sm rounded-xl px-4 py-2.5 font-bold focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">상영관 위치</label>
+          <select id="modalTheaterSelect" class="w-full bg-cgv-surface border border-cgv-border text-white text-sm rounded-xl px-4 py-2.5 focus:border-cgv-red">
+            <option>CGV 용산아이파크몰 (IMAX GT관)</option>
+            <option>CGV 왕십리 (IMAX관)</option>
+            <option>CGV 영등포 (SCREENX PLF관)</option>
+            <option>CGV 강남 (4DX관)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">상영 회차 선택</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="selectTimeSlot(this)" class="time-slot-btn py-2.5 bg-cgv-red text-white text-xs font-bold rounded-xl border border-cgv-red">14:20 (잔여 18석)</button>
+            <button onclick="selectTimeSlot(this)" class="time-slot-btn py-2.5 bg-cgv-surface text-gray-300 text-xs font-medium rounded-xl border border-gray-700 hover:border-gray-500">17:10 (잔여 42석)</button>
+            <button onclick="selectTimeSlot(this)" class="time-slot-btn py-2.5 bg-cgv-surface text-gray-300 text-xs font-medium rounded-xl border border-gray-700 hover:border-gray-500">20:00 (잔여 08석)</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 mb-1">명당 좌석 지정</label>
+          <div class="p-3.5 bg-black/50 rounded-xl border border-white/10 flex justify-between items-center text-xs">
+            <span class="text-cgv-gold font-bold" id="modalSeatRecommendText">G열 12번 (골든 에리어 시선일치 구역)</span>
+            <span class="text-emerald-400 font-bold">자동 지정 완료</span>
+          </div>
+        </div>
+
+        <!-- Confirm CTA -->
+        <button onclick="submitBooking()" class="w-full py-4 bg-cgv-red hover:bg-cgv-redHover text-white font-extrabold rounded-xl text-sm shadow-glow-red transition-all mt-4 active:scale-95">
+          선택한 정보로 예매 및 결제 진행 ➔
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Toast Notification Bar -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 hidden bg-cgv-surface border-2 border-cgv-red text-white px-5 py-3.5 rounded-2xl shadow-glow-red text-xs font-extrabold flex items-center space-x-3">
+    <span class="text-xl">✅</span>
+    <span id="toastMessageText">예매 정보가 성공적으로 등록되었습니다.</span>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- 9. JAVASCRIPT LOGIC & STATE ENGINE -->
+  <!-- ========================================== -->
+  <script>
+    // Application State Management
+    const appState = {
+      inspectorMode: false,
+      activeFormat: 'imax',
+      audioMode: 'atmos',
+      aspectRatioValue: 100,
+      activeSeatRow: 'G',
+      selectedTime: '14:20',
+      filterAudience: 'couple',
+      filterExperience: 'visual'
+    };
+
+    // On Load Initializer
+    window.onload = function() {
+      initAmbientCanvas();
+      initAudioWaveCanvas();
+      selectSeatRow('G');
+    };
+
+    // Toggle Portfolio UX Inspector Mode
+    function toggleInspectorMode() {
+      appState.inspectorMode = !appState.inspectorMode;
+      const callouts = document.querySelectorAll('.inspector-callout');
+      const banner = document.getElementById('inspectorBanner');
+      const btnText = document.getElementById('inspectorBtnText');
+
+      if (appState.inspectorMode) {
+        callouts.forEach(el => el.classList.remove('hidden'));
+        banner.classList.remove('hidden');
+        btnText.innerText = "기획 의도 보기 [ON]";
+        showToast("🎨 10년차 디자이너 UX 기획 주석 모드가 활성화되었습니다.");
+      } else {
+        callouts.forEach(el => el.classList.add('hidden'));
+        banner.classList.add('hidden');
+        btnText.innerText = "기획 의도 보기 [OFF]";
+      }
+    }
+
+    // Toggle Language
+    function toggleLanguage() {
+      showToast("🌐 한국어 / English 언어 설정이 전환되었습니다.");
+    }
+
+    // Hero Floating Dock Selector
+    function selectHeroFormat(formatKey) {
+      appState.activeFormat = formatKey;
+      
+      document.querySelectorAll('.dock-btn').forEach(btn => {
+        btn.classList.remove('bg-cgv-red/20', 'border-cgv-red');
+        btn.classList.add('bg-cgv-surface', 'border-transparent');
+      });
+
+      const selectedDock = document.getElementById(`dock-${formatKey}`);
+      if (selectedDock) {
+        selectedDock.classList.remove('bg-cgv-surface', 'border-transparent');
+        selectedDock.classList.add('bg-cgv-red/20', 'border-cgv-red');
+      }
+
+      const backdrop = document.getElementById('heroFormatBackdrop');
+      if (formatKey === 'imax') {
+        backdrop.className = "absolute inset-0 bg-gradient-to-t from-cgv-dark via-cgv-dark/70 to-transparent transition-all duration-700";
+      } else if (formatKey === '4dx') {
+        backdrop.className = "absolute inset-0 bg-gradient-to-t from-cgv-dark via-blue-950/40 to-transparent transition-all duration-700";
+      } else if (formatKey === 'screenx') {
+        backdrop.className = "absolute inset-0 bg-gradient-to-t from-cgv-dark via-purple-950/40 to-transparent transition-all duration-700";
+      }
+
+      showToast(`🎬 ${formatKey.toUpperCase()} 포맷 뷰가 라이브 적용되었습니다.`);
+    }
+
+    // Aspect Ratio Slider Updates
+    function updateAspectRatioSlider(val) {
+      appState.aspectRatioValue = val;
+      const maskTop = document.getElementById('croppedMaskTop');
+      const maskBottom = document.getElementById('croppedMaskBottom');
+      const label = document.getElementById('sliderValueText');
+
+      const barHeight = ((100 - val) / 100) * 18; 
+      maskTop.style.height = `${barHeight}%`;
+      maskBottom.style.height = `${barHeight}%`;
+
+      if (val > 80) {
+        label.innerText = "IMAX 1.90:1 (풀스크린 26% 확장)";
+        label.className = "text-xs font-mono px-2.5 py-1 bg-cgv-dark rounded-md text-cgv-gold font-bold border border-cgv-gold/30";
+      } else {
+        label.innerText = "Standard 2.39:1 (상하 블랙바 잘림)";
+        label.className = "text-xs font-mono px-2.5 py-1 bg-cgv-dark rounded-md text-gray-400 font-bold border border-gray-700";
+      }
+    }
+
+    // Audio Mode Selector
+    function setAudioMode(mode) {
+      appState.audioMode = mode;
+      const btnStereo = document.getElementById('btn-stereo');
+      const btnAtmos = document.getElementById('btn-atmos');
+
+      if (mode === 'atmos') {
+        btnAtmos.className = "py-3 px-4 rounded-xl border-2 border-cgv-red bg-cgv-red/20 text-white text-xs font-bold shadow-glow-red transition-all flex flex-col items-center space-y-1";
+        btnStereo.className = "py-3 px-4 rounded-xl border border-gray-700 bg-cgv-surface text-gray-300 text-xs font-bold hover:border-gray-500 transition-all flex flex-col items-center space-y-1";
+        showToast("🔊 64채널 Dolby Atmos 입체 음향 모드가 설정되었습니다.");
+      } else {
+        btnStereo.className = "py-3 px-4 rounded-xl border-2 border-blue-500 bg-blue-900/20 text-white text-xs font-bold transition-all flex flex-col items-center space-y-1";
+        btnAtmos.className = "py-3 px-4 rounded-xl border border-gray-700 bg-cgv-surface text-gray-300 text-xs font-bold hover:border-gray-500 transition-all flex flex-col items-center space-y-1";
+        showToast("🎧 2.1ch 스테레오 모드가 설정되었습니다.");
+      }
+    }
+
+    // Audio Waveform Canvas Animation
+    function initAudioWaveCanvas() {
+      const canvas = document.getElementById('audioWaveCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let step = 0;
+
+      function renderWave() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.lineWidth = 2.5;
+        step += 0.04;
+
+        const isAtmos = appState.audioMode === 'atmos';
+        const waveCount = isAtmos ? 4 : 1;
+
+        for (let i = 0; i < waveCount; i++) {
+          ctx.beginPath();
+          ctx.strokeStyle = isAtmos 
+            ? (i % 2 === 0 ? '#E60012' : '#FFD700') 
+            : '#6B7280';
+
+          for (let x = 0; x < canvas.width; x += 4) {
+            const freq = isAtmos ? 0.025 : 0.015;
+            const amp = isAtmos ? 24 - i * 5 : 10;
+            const y = canvas.height / 2 + Math.sin(x * freq + step + i) * amp;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+
+        requestAnimationFrame(renderWave);
+      }
+      renderWave();
+    }
+
+    // Bento Grid IMAX Screen Expansion Toggle
+    let bentoImaxExpanded = false;
+    function toggleBentoImaxExpand() {
+      const screen = document.getElementById('bentoImaxScreen');
+      const label = document.getElementById('bentoImaxLabel');
+      bentoImaxExpanded = !bentoImaxExpanded;
+
+      if (bentoImaxExpanded) {
+        screen.className = "w-full h-full bg-gradient-to-r from-cgv-red via-purple-600 to-blue-600 rounded-xl transition-all duration-500 flex items-center justify-center shadow-glow-red relative";
+        label.innerText = "IMAX 1.90:1 FULL EXPANDED SCREEN";
+      } else {
+        screen.className = "w-2/3 h-32 bg-gradient-to-r from-blue-900 via-cgv-red to-purple-900 rounded-xl transition-all duration-500 flex items-center justify-center shadow-2xl relative";
+        label.innerText = "STANDARD SCREEN";
+      }
+    }
+
+    // 4DX Sensory Effect Trigger
+    function trigger4dxEffect(type) {
+      const seat = document.getElementById('seatGraphic');
+      seat.classList.add('animate-vibrate', 'text-cgv-red');
+      
+      let msg = "";
+      if (type === 'wind') msg = "💨 4DX 에어 젯 강풍 연출이 실행됩니다.";
+      if (type === 'water') msg = "💧 워터 미스트 스프레이 작동!";
+      if (type === 'scent') msg = "🌿 아로마 디퓨저 시그니처 향기 분사!";
+      if (type === 'shake') msg = "💥 모션시트 12축 가속도 진동 어레이 작동!";
+
+      showToast(msg);
+
+      setTimeout(() => {
+        seat.classList.remove('animate-vibrate', 'text-cgv-red');
+      }, 1200);
+    }
+
+    // SCREENX Panorama Toggle
+    function toggleSxSide(side) {
+      const btn = document.getElementById(`sx-${side}`);
+      btn.classList.add('scale-105', 'border-cgv-gold');
+      setTimeout(() => btn.classList.remove('scale-105', 'border-cgv-gold'), 400);
+      showToast(`📺 SCREENX ${side.toUpperCase()} 측면 스크린 반응성 테스트!`);
+    }
+
+    // MoviePass Discount Calculator
+    function calculatePassDiscount() {
+      const select = document.getElementById('calcMovies');
+      const result = document.getElementById('calcResultText');
+      const count = parseInt(select.value);
+
+      const saved = count * 2500 * 12;
+      result.innerText = `연간 ${saved.toLocaleString()}원 절약`;
+    }
+
+    // Seat Row Perspective Selector
+    function selectSeatRow(row) {
+      appState.activeSeatRow = row;
+
+      document.querySelectorAll('.seat-row-btn').forEach(btn => {
+        btn.classList.remove('bg-cgv-red/20', 'border-2', 'border-cgv-red', 'shadow-glow-red');
+        btn.classList.add('bg-cgv-card', 'border', 'border-transparent');
+      });
+
+      const activeBtn = document.getElementById(`seat-btn-${row}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-cgv-card', 'border-transparent');
+        activeBtn.classList.add('bg-cgv-red/20', 'border-2', 'border-cgv-red', 'shadow-glow-red');
+      }
+
+      const screen = document.getElementById('simulatedScreen');
+      const title = document.getElementById('currentSeatRowTitle');
+      const desc = document.getElementById('seatViewDescText');
+
+      if (row === 'A') {
+        screen.style.transform = "scale(1.22) translateY(12px) rotateX(-6deg)";
+        title.innerText = "A열 08번 (전열 몰입석 시야각)";
+        desc.innerText = "시야 전체를 가득 채우는 스크린으로 독보적 임팩트를 전달받는 전열 관람";
+      } else if (row === 'G') {
+        screen.style.transform = "scale(1.0) translateY(0deg) rotateX(0deg)";
+        title.innerText = "G열 12번 (★ 골든 에리어 명당 시야각)";
+        desc.innerText = "시선 일치가 완벽하며 화면 왜곡이 전혀 없는 최상의 골든 에리어 스팟";
+      } else if (row === 'M') {
+        screen.style.transform = "scale(0.82) translateY(-12px) rotateX(6deg)";
+        title.innerText = "M열 15번 (후열 서라운드석 시야각)";
+        desc.innerText = "전체 스크린이 한눈에 조망되며 64채널 서라운드 음향 밸런스가 뛰어난 후열석";
+      }
+    }
+
+    // Filter Recommendation Logic
+    function setFilterAudience(type) {
+      appState.filterAudience = type;
+      updateFilterButtons('filter-aud-btn', `filter-${type}`);
+      evaluateMatrixRecommendation();
+    }
+
+    function setFilterExperience(type) {
+      appState.filterExperience = type;
+      updateFilterButtons('filter-exp-btn', `filter-${type}`);
+      evaluateMatrixRecommendation();
+    }
+
+    function updateFilterButtons(className, activeId) {
+      document.querySelectorAll(`.${className}`).forEach(btn => {
+        btn.className = `${className} py-2 px-3 rounded-xl bg-cgv-surface border border-gray-700 text-xs font-bold text-gray-300 hover:border-cgv-red`;
+      });
+      const activeBtn = document.getElementById(activeId);
+      if (activeBtn) {
+        activeBtn.className = `${className} py-2 px-3 rounded-xl bg-cgv-red/20 border-2 border-cgv-red text-xs font-extrabold text-white`;
+      }
+    }
+
+    function evaluateMatrixRecommendation() {
+      const badge = document.getElementById('recommendResultBadge');
+      const rows = ['imax', '4dx', 'screenx', 'privatebox'];
+      
+      rows.forEach(r => {
+        const el = document.getElementById(`row-${r}`);
+        if (el) el.classList.remove('bg-cgv-red/20', 'border-2', 'border-cgv-red');
+      });
+
+      let rec = 'imax';
+      if (appState.filterExperience === 'sensory') rec = '4dx';
+      else if (appState.filterExperience === 'vip') rec = 'privatebox';
+      else if (appState.filterAudience === 'family') rec = 'screenx';
+
+      const recRow = document.getElementById(`row-${rec}`);
+      if (recRow) recRow.classList.add('bg-cgv-red/20');
+
+      if (rec === 'imax') badge.innerText = "🔥 IMAX LASER (압도적 몰입감 최적 선택)";
+      if (rec === '4dx') badge.innerText = "🎢 4DX (액션 & 오감 모션 최적 선택)";
+      if (rec === 'screenx') badge.innerText = "📐 SCREENX (270도 파노라마 다인 관람 최적)";
+      if (rec === 'privatebox') badge.innerText = "🥂 PRIVATE BOX (최상급 VIP 라운지 관람)";
+    }
+
+    // Booking Modal Functionality
+    function openBookingModal(formatName = 'IMAX LASER 3D') {
+      const modal = document.getElementById('bookingModal');
+      const formatInput = document.getElementById('modalFormatInput');
+      formatInput.value = formatName;
+      modal.classList.remove('hidden');
+    }
+
+    function openBookingModalWithSeat() {
+      openBookingModal(`IMAX LASER (${appState.activeSeatRow}열 명당 지정)`);
+    }
+
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.add('hidden');
+    }
+
+    function selectTimeSlot(btn) {
+      document.querySelectorAll('.time-slot-btn').forEach(b => {
+        b.className = "time-slot-btn py-2.5 bg-cgv-surface text-gray-300 text-xs font-medium rounded-xl border border-gray-700 hover:border-gray-500";
+      });
+      btn.className = "time-slot-btn py-2.5 bg-cgv-red text-white text-xs font-bold rounded-xl border border-cgv-red";
+      appState.selectedTime = btn.innerText.split(' ')[0];
+    }
+
+    function submitBooking() {
+      closeBookingModal();
+      showToast(`🎟️ [${appState.selectedTime}] 예매 및 명당 지정이 완벽히 완료되었습니다!`);
+    }
+
+    // Toast Message Helper
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      const msgText = document.getElementById('toastMessageText');
+      msgText.innerText = msg;
+
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3200);
+    }
+
+    // Ambient Particles Canvas Background
+    function initAmbientCanvas() {
+      const canvas = document.getElementById('ambientCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      for (let i = 0; i < 45; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 2 + 1,
+          speedY: Math.random() * 0.4 + 0.15,
+          opacity: Math.random() * 0.6 + 0.2
+        });
+      }
+
+      function drawParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.y -= p.speedY;
+          if (p.y < 0) p.y = canvas.height;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(230, 0, 18, ${p.opacity})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(drawParticles);
+      }
+      drawParticles();
+    }
+  </script>
+</body>
+</html>
